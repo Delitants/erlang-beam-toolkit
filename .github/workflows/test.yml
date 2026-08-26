@@ -1,0 +1,39 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  otp:
+    name: OTP ${{ matrix.otp }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        otp: ['27', '28', '29']
+    container:
+      image: erlang:${{ matrix.otp }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install test utilities
+        run: >-
+          apt-get update &&
+          apt-get install -y --no-install-recommends bash coreutils gzip graphviz &&
+          rm -rf /var/lib/apt/lists/*
+      - name: Public tree scan tests
+        run: bash tests/test_publication_scan.sh
+      - name: Public tree scan
+        run: bash tests/publication_scan.sh
+      - name: Shell syntax
+        run: >-
+          bash -n beam_patch_toolkit.sh &&
+          bash -n tests/test_beam_patch_toolkit.sh &&
+          bash -n tests/publication_scan.sh &&
+          bash -n tests/test_publication_scan.sh
+      - name: Regression suite
+        run: TOOL="$PWD/beam_patch_toolkit.sh" bash tests/test_beam_patch_toolkit.sh

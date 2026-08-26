@@ -1,0 +1,20 @@
+#{schema => beam_flow_scenario_v1,
+  timeout_ms => 5000,
+  steps => [
+    #{op => load, module => flow_on_load_fixture},
+    #{op => call, mfa => {flow_on_load_fixture, ready, 0},
+      args => [], bind => ready},
+    #{op => assert, value => {binding, ready}, equals => true},
+    #{op => call, mfa => {flow_runtime_fixture, call_chain, 1},
+      args => [sample]},
+    #{op => call, mfa => {flow_runtime_fixture, catch_fail, 0},
+      args => [], bind => caught_failure},
+    #{op => assert, value => {binding, caught_failure},
+      equals => expected_failure},
+    #{op => spawn, mfa => {flow_runtime_fixture, worker, 1},
+      args => [{self}], bind => worker},
+    #{op => send, target => {binding, worker}, message => {echo, sample}},
+    #{op => await, pattern => {echoed, sample}, timeout_ms => 1000},
+    #{op => send, target => {binding, worker}, message => stop},
+    #{op => stop}
+  ]}.
