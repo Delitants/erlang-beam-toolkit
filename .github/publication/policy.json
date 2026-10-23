@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "repository": "Delitants/erlang-beam-toolkit",
+  "baseline": "c7e99ffee9e0610f5047a3068ccedab20ef6544f",
+  "public_docs": [],
+  "public_data": [],
+  "release_assets": [
+    "beam_patch_toolkit.sh",
+    "erlang-beam-toolkit-v*.tar.gz",
+    "SHA256SUMS"
+  ]
+}
